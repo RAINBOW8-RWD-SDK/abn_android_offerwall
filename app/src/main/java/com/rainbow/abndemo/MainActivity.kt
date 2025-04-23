@@ -3,6 +3,7 @@ package com.rainbow.abndemo
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.rainbow.abn.AbnOfferwallActivity
 import com.rainbow.abn.AbnOfferwallListener
@@ -21,8 +22,8 @@ class MainActivity: AppCompatActivity() {
         setContentView(binding.getRoot())
 
         AbnSession.shared.initInstance(this)
-        AbnSession.shared.setUserName("test_user")
-        AbnSession.shared.setAdid("00000000-0000-0000-0000-000000000000")
+        AbnSession.shared.setUserName("rwd_test")
+        AbnSession.shared.setAdid("7ad2f9f6-adf4-4849-91ba-927a4ed97d43")
         AbnSession.shared.setAgreePrivacyPolicy(false)
 
         // View 추가
@@ -32,14 +33,15 @@ class MainActivity: AppCompatActivity() {
                 // 광고가 성공적으로 로드되었을 때 실행되는 코드
             }
 
-            override fun onClose() {
-                // 광고를 닫았을 때 실행되는 코드
-                finish()
-            }
-
             override fun onAdItemClicked(campaignId: Int, campaignName: String) {
                 // 광고 항목이 클릭되었을 때 실행되는 코드
             }
+
+            override fun onOfferwallRemoved() {
+                // AbnOfferwallView가 닫히면 호출
+                Toast.makeText(applicationContext, "remove", Toast.LENGTH_SHORT).show()
+            }
+
         })
 
         // OfferwallActivity 실행
@@ -58,6 +60,10 @@ class MainActivity: AppCompatActivity() {
 
         AbnSession.shared.querypoint { point ->
             Log.d("point", "$point")
+        }
+
+        AbnSession.shared.queryadvertisecount { result ->
+            val count = result
         }
     }
 
