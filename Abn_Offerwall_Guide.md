@@ -264,13 +264,12 @@ override fun onCreate(savedInstanceState: Bundle?) {
             // 광고가 성공적으로 로드되었을 때 실행되는 코드
         }
 
-        override fun onClose() {
-            // 광고를 닫았을 때 실행되는 코드
-            finish()
-        }
-
         override fun onAdItemClicked(campaignId: Int, campaignName: String) {
             // 광고 항목이 클릭되었을 때 실행되는 코드
+        }
+        
+        override fun onOfferwallRemoved() {
+            // AbnOfferwallView가 닫히면 호출
         }
     })
 
@@ -288,6 +287,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
                     // 광고 뷰가 뒤로 가기 이벤트를 처리하지 않으면, 광고 뷰를 레이아웃에서 제거
                     binding.frame.removeView(abnOfferwallView)
                     abnOfferwallView = null  // 광고 뷰 객체를 null로 설정하여 메모리에서 해제
+                    // SDK 사용자 앱 상황에 따라 변경.
                 }
             }
         } else {
