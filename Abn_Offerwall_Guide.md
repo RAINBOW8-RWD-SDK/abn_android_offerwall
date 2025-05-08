@@ -319,8 +319,12 @@ AbnSession.shared.querypoint { point ->
 #### 동기 방식 호출
 
 ```kotlin
-val point = AbnSession.shared.querypoint();
-tvPoint.text = "포인트: $point"
+Thread {
+    val point = AbnSession.shared.querypoint();
+    Handler(Looper.getMainLooper()).post {
+        tvPoint.text = "포인트: $point"
+    }
+}.start()
 ```
 
 ### 2. 적립 가능한 광고수, 포인트
@@ -331,8 +335,8 @@ tvPoint.text = "포인트: $point"
 
 ```kotlin
 AbnSession.shared.queryadvertisecount { result ->
-    val adCount = result[0]
-    val point = result[1]
+    val adCount = result?.getOrNull(0) ?: 0
+    val point = result?.getOrNull(1) ?: 0
     tvAdCount.text = "참여 가능 광고수: $adCount"
     tvPoint.text = "적립 가능한 포인트: $point"
 }
@@ -341,11 +345,15 @@ AbnSession.shared.queryadvertisecount { result ->
 #### 동기 방식 호출
 
 ```kotlin
-val result = AbnSession.shared.queryadvertisecount()
-val adCount = result[0]
-val point = result[1]
-tvAdCount.text = "참여 가능 광고수: $adCount"
-tvPoint.text = "적립 가능한 포인트: $point"
+Thread {
+    val result = AbnSession.shared.queryadvertisecount()
+    val adCount = result?.getOrNull(0) ?: 0
+    val point = result?.getOrNull(1) ?: 0
+    Handler(Looper.getMainLooper()).post {
+        tvAdCount.text = "참여 가능 광고수: $adCount"
+        tvPoint.text = "적립 가능한 포인트: $point"
+    }
+}.start()
 ```
 
 ### 3. 퍼블리셔 앱 게시 상태
@@ -367,13 +375,12 @@ AbnSession.shared.querypublishstate { state ->
 #### 동기 방식 호출
 
 ```kotlin
-val state = AbnSession.shared.querypublishstate()
-
-if (state) {
-    tvPublishState.text = "게시 상태 ON"
-} else {
-    tvPublishState.text = "게시 상태 OFF"
-}
+Thread {
+    val state = AbnSession.shared.querypublishstate()
+    Handler(Looper.getMainLooper()).post {
+        tvPublishState.text = if (state) "게시 상태 ON" else "게시 상태 OFF"
+    }
+}.start()
 ```
 
 ### 4. 개인정보 수집동의 여부 설정
