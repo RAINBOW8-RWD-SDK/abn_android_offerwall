@@ -189,10 +189,12 @@ class MainActivity: AppCompatActivity() {
             startActivity(intent)
         }
 
-        // 받을 수 있는 포인트
-        AbnSession.shared.querypoint { point ->
-            binding.tvPoint.text = point
-        }
+        // 받을 수 있는 포인트 
+        AbnSession.shared.queryPoint(context, object : AbnCallback<Int> { 
+            override fun onReceive(context: Context, result: Int) {
+               binding.tv.text = point
+            }
+        })
 
     }
 }
@@ -311,19 +313,21 @@ override fun onCreate(savedInstanceState: Bundle?) {
 #### 비동기 방식 호출
 
 ```kotlin
-AbnSession.shared.querypoint { point ->
-    tvPoint.text = "포인트: $point"
-}
+AbnSession.shared.queryPoint(context, object : AbnCallback<Int> {
+   override fun onReceive(context: Context, result: Int) {
+      tvPoint.text = "포인트: $result"
+   }
+})
 ```
 
 #### 동기 방식 호출
 
 ```kotlin
 Thread {
-    val point = AbnSession.shared.querypoint();
-    Handler(Looper.getMainLooper()).post {
-        tvPoint.text = "포인트: $point"
-    }
+   val point = AbnSession.shared.queryPoint()
+   Handler(Looper.getMainLooper()).post {
+      tvPoint.text = "포인트: $point"
+   }
 }.start()
 ```
 
@@ -334,12 +338,14 @@ Thread {
 #### 비동기 방식 호출
 
 ```kotlin
-AbnSession.shared.queryadvertisecount { result ->
-    val adCount = result?.getOrNull(0) ?: 0
-    val point = result?.getOrNull(1) ?: 0
-    tvAdCount.text = "참여 가능 광고수: $adCount"
-    tvPoint.text = "적립 가능한 포인트: $point"
-}
+AbnSession.shared.queryAdvertiseCount(context, object : AbnCallback<IntArray> {
+   override fun onReceive(context: Context, result: IntArray) {
+      val adCount = result.getOrNull(0) ?: 0
+      val point = result.getOrNull(1) ?: 0
+      tvAdCount.text = "참여 가능 광고수: $adCount"
+      tvPoint.text = "적립 가능한 포인트: $point"
+   }
+})
 ```
 
 #### 동기 방식 호출
@@ -363,23 +369,21 @@ Thread {
 #### 비동기 방식 호출
 
 ```kotlin
-AbnSession.shared.querypublishstate { state ->
-    if (state) {
-        tvPublishState.text = "게시 상태 ON"
-    } else {
-        tvPublishState.text = "게시 상태 OFF"
-    }
-}
+AbnSession.shared.queryPublishState(context, object : AbnCallback<Boolean> {
+   override fun onReceive(context: Context, result: Boolean) {
+      tvPublishState.text = if (result) "게시 상태 ON" else "게시 상태 OFF"
+   }
+})
 ```
 
 #### 동기 방식 호출
 
 ```kotlin
 Thread {
-    val state = AbnSession.shared.querypublishstate()
-    Handler(Looper.getMainLooper()).post {
-        tvPublishState.text = if (state) "게시 상태 ON" else "게시 상태 OFF"
-    }
+   val isPublished = AbnSession.shared.queryPublishState()
+   Handler(Looper.getMainLooper()).post {
+      tvPublishState.text = if (isPublished) "게시 상태 ON" else "게시 상태 OFF"
+   }
 }.start()
 ```
 

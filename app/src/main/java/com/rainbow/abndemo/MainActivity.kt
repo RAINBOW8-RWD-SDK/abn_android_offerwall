@@ -1,10 +1,12 @@
 package com.rainbow.abndemo
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.rainbow.abn.AbnCallback
 import com.rainbow.abn.AbnOfferwallActivity
 import com.rainbow.abn.AbnOfferwallListener
 import com.rainbow.abn.AbnOfferwallView
@@ -26,7 +28,45 @@ class MainActivity: AppCompatActivity() {
         AbnSession.shared.setAdid("7ad2f9f6-adf4-4849-91ba-927a4ed97d43")
         AbnSession.shared.setAgreePrivacyPolicy(false)
 
-        // View 추가
+        initOfferwallView()
+
+        // OfferwallActivity 실행
+        binding.btnActivity.setOnClickListener {
+            val intent = Intent(this, AbnOfferwallActivity::class.java)
+            intent.putExtra("title", "AOS 무료충전소") // 상단 타이틀을 "무료충전소"로 설정
+            startActivity(intent)
+            binding.btnView.setOnClickListener {
+                // 광고 뷰를 특정 레이아웃(Frame)에 추가
+        }
+
+            if(abnOfferwallView == null) initOfferwallView()
+            binding.frame.addView(abnOfferwallView)
+            // 광고 데이터 로드
+            abnOfferwallView?.loadData()
+        }
+
+        AbnSession.shared.queryPoint(this, object: AbnCallback<Int> {
+            override fun onReceive(context: Context, result: Int) {
+                Log.d("point", "$result")
+            }
+        })
+
+        AbnSession.shared.queryAdvertiseCount(this, object: AbnCallback<IntArray> {
+            override fun onReceive(context: Context, result: IntArray) {
+                val adCount = result.getOrNull(0) ?: 0
+                val point = result.getOrNull(1) ?: 0
+            }
+        })
+
+        AbnSession.shared.queryPublishState(this, object : AbnCallback<Boolean> {
+            override fun onReceive(context: Context, result: Boolean) {
+            }
+        })
+
+        AbnSession.shared.queryPoint()
+    }
+
+    fun initOfferwallView() {
         abnOfferwallView = AbnOfferwallView(this)
         abnOfferwallView?.setListener(object: AbnOfferwallListener {
             override fun onLoaded() {
@@ -43,28 +83,6 @@ class MainActivity: AppCompatActivity() {
             }
 
         })
-
-        // OfferwallActivity 실행
-        binding.btnActivity.setOnClickListener {
-            val intent = Intent(this, AbnOfferwallActivity::class.java)
-            intent.putExtra("title", "무료충전소") // 상단 타이틀을 "무료충전소"로 설정
-            startActivity(intent)
-        }
-
-        binding.btnView.setOnClickListener {
-            // 광고 뷰를 특정 레이아웃(Frame)에 추가
-            binding.frame.addView(abnOfferwallView)
-            // 광고 데이터 로드
-            abnOfferwallView?.loadData()
-        }
-
-        AbnSession.shared.querypoint { point ->
-            Log.d("point", "$point")
-        }
-
-        AbnSession.shared.queryadvertisecount { result ->
-            val count = result
-        }
     }
 
     override fun onBackPressed() {
